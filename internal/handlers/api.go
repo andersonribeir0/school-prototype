@@ -1,19 +1,45 @@
 package handlers
 
 import (
+	"os"
+
 	"github.com/andersonribeir0/school-prototype/internal/logger"
-	"github.com/andersonribeir0/school-prototype/internal/service"
+	"github.com/andersonribeir0/school-prototype/internal/models"
+	"github.com/andersonribeir0/school-prototype/internal/services"
+	"github.com/golang-jwt/jwt/v5"
+	echojwt "github.com/labstack/echo-jwt/v4"
 	"github.com/labstack/echo/v4"
 )
 
 type API struct {
 	Echo    *echo.Echo
 	logger  logger.Logger
-	userSvc service.UserSvc
+	userSvc services.UserSvc
 }
 
-func NewAPI(logger logger.Logger, userSvc service.UserSvc) *API {
+type jwtCustomClaims struct {
+	Username string        `json:"name"`
+	Roles    []models.Role `json:"roles"`
+	jwt.RegisteredClaims
+}
+
+func NewAPI(logger logger.Logger, userSvc services.UserSvc) *API {
 	e := echo.New()
 
-	return &API{Echo: e, logger: logger, userSvc: userSvc}
+	api := &API{Echo: e, logger: logger, userSvc: userSvc}
+
+	api.Echo.POST("/login", api.LoginHandler)
+	api.Echo.POST("/user", api.AddUserHandler)
+
+	r := api.Echo.Group("/auth")
+	config := echojwt.Config{
+		NewClaimsFunc: func(c echo.Context) jwt.Claims {
+			return new(jwtCustomClaims)
+		},
+		SigningKey: []byte(os.Getenv("JWT_SIGNING_KEY")),
+	}
+	r.Use(echojwt.WithConfig(config))
+	r.GET("/me", api.GetMeHandler)
+
+	return api
 }
