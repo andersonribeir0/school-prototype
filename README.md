@@ -38,10 +38,7 @@ The School Prototype App is a straightforward school management application offe
  - **Headers**: `Authorization: Bearer <token>`
 
 ## Password Security
-The application currently employs SHA-256 for hashing passwords. Although SHA-256 is secure for many uses, it's not the best choice for password hashing due to its susceptibility to brute force and rainbow table attacks.
-
-### Suggested Improvement
-For enhanced security of passwords, it's advisable to use algorithms specifically intended for password hashing, like bcrypt, Argon2, or PBKDF2. These algorithms are designed to be computationally demanding and automatically incorporate a salt, making brute force attacks substantially more difficult.
+The application currently employs bcrypt to protect the password in order to prevent brute force attacks and rainbow tables.
 
 ## Implementing Permissions
 ### Next steps
