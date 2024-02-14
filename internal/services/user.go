@@ -61,10 +61,6 @@ func (u *User) VerifyPwd(ctx context.Context, username string, password string) 
 		Password: password,
 	}
 
-	if err := user.ParsePwd(); err != nil {
-		return nil, err
-	}
-
 	user, err := u.userRepo.GetUserByUsername(ctx, user.Username)
 	if err != nil {
 		return nil, ErrUserInfo
@@ -74,7 +70,7 @@ func (u *User) VerifyPwd(ctx context.Context, username string, password string) 
 		return nil, ErrUserNotFound
 	}
 
-	if !user.CheckPwd(user.Password) {
+	if !user.CheckPwd(password) {
 		return nil, ErrInvalidUserOrPwd
 	}
 

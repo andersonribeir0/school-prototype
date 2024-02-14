@@ -18,7 +18,7 @@ func (a *API) AddUserHandler(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusOK, &Response{
 			Body:    nil,
-			Err:     ErrInvalidBody,
+			Message: ErrInvalidBody.Error(),
 			Success: false,
 		})
 	}
@@ -35,7 +35,7 @@ func (a *API) AddUserHandler(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, &Response{
 		Body:    nil,
-		Err:     nil,
+		Message: "OK",
 		Success: true,
 	})
 }
@@ -45,7 +45,7 @@ func (a *API) LoginHandler(c echo.Context) error {
 	if err := c.Bind(&loginReq); err != nil {
 		return c.JSON(http.StatusBadRequest, &Response{
 			Body:    nil,
-			Err:     ErrInvalidBody,
+			Message: ErrInvalidBody.Error(),
 			Success: false,
 		})
 	}
@@ -54,7 +54,7 @@ func (a *API) LoginHandler(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusUnauthorized, &Response{
 			Body:    nil,
-			Err:     err,
+			Message: err.Error(),
 			Success: false,
 		})
 	}
@@ -76,7 +76,7 @@ func (a *API) LoginHandler(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, &Response{
 		Body:    map[string]any{"token": t},
-		Err:     nil,
+		Message: "",
 		Success: true,
 	})
 }

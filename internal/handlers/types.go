@@ -12,9 +12,9 @@ var jwtKey = []byte(os.Getenv("JWT_KEY"))
 var ErrInvalidBody = errors.New("invalid request body received")
 
 type Response struct {
-	Body    any   `json:"body"`
-	Err     error `json:"message"`
-	Success bool  `json:"success"`
+	Body    any    `json:"body"`
+	Message string `json:"message"`
+	Success bool   `json:"success"`
 }
 
 type LoginRequest struct {
