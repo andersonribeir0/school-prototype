@@ -21,8 +21,8 @@ func (m *UserRepositoryMock) GetUserById(ctx context.Context, id string) (*model
 	return args.Get(0).(*models.User), args.Error(1)
 }
 
-func (m *UserRepositoryMock) GetUserByUsernameAndPassword(ctx context.Context, username, password string) (*models.User, error) {
-	args := m.Called(ctx, username, password)
+func (m *UserRepositoryMock) GetUserByUsername(ctx context.Context, username string) (*models.User, error) {
+	args := m.Called(ctx, username)
 	return args.Get(0).(*models.User), args.Error(1)
 }
 

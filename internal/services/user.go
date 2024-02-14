@@ -12,6 +12,8 @@ import (
 var (
 	ErrOnUserInsertion  = errors.New("user is already in the insert operation")
 	ErrInvalidUserOrPwd = errors.New("invalid user or password")
+	ErrUserInfo         = errors.New("it was not possible to get user information")
+	ErrUserNotFound     = errors.New("user not found")
 )
 
 type UserSvc interface {
@@ -63,8 +65,16 @@ func (u *User) VerifyPwd(ctx context.Context, username string, password string) 
 		return nil, err
 	}
 
-	user, err := u.userRepo.GetUserByUsernameAndPassword(ctx, user.Username, user.Password)
+	user, err := u.userRepo.GetUserByUsername(ctx, user.Username)
 	if err != nil {
+		return nil, ErrUserInfo
+	}
+
+	if user == nil {
+		return nil, ErrUserNotFound
+	}
+
+	if !user.CheckPwd(user.Password) {
 		return nil, ErrInvalidUserOrPwd
 	}
 

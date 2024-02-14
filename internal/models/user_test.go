@@ -1,66 +1,124 @@
 package models
 
 import (
+	"encoding/hex"
 	"testing"
 )
-
-func TestUser_HasRole(t *testing.T) {
-	user := User{
-		Username: "john_doe",
-		Roles:    []Role{Student, Admin},
-	}
-
-	tests := []struct {
-		role Role
-		want bool
-	}{
-		{Student, true},
-		{Teacher, false},
-		{Admin, true},
-	}
-
-	for _, tt := range tests {
-		t.Run(string(tt.role), func(t *testing.T) {
-			if got := user.HasRole(tt.role); got != tt.want {
-				t.Errorf("User.HasRole() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
 
 func TestUser_Validate(t *testing.T) {
 	tests := []struct {
 		name    string
 		user    User
-		wantErr error
+		wantErr bool
+		err     error
 	}{
-		{"ValidUser", User{Username: "john_doe", Password: "secret", Roles: []Role{Student}}, nil},
-		{"NoUsername", User{Password: "secret", Roles: []Role{Student}}, ErrUsernameRequired},
-		{"NoPassword", User{Username: "john_doe", Roles: []Role{Student}}, ErrPwdRequired},
-		{"NoRoles", User{Username: "john_doe", Password: "secret"}, ErrAtLeastOneRoleRequired},
+		{
+			name: "Valid user",
+			user: User{
+				Username: "testuser",
+				Password: "password",
+				Roles:    []Role{Student},
+			},
+			wantErr: false,
+		},
+		{
+			name: "No username",
+			user: User{
+				Password: "password",
+				Roles:    []Role{Student},
+			},
+			wantErr: true,
+			err:     ErrUsernameRequired,
+		},
+		{
+			name: "No password",
+			user: User{
+				Username: "testuser",
+				Roles:    []Role{Student},
+			},
+			wantErr: true,
+			err:     ErrPwdRequired,
+		},
+		{
+			name: "No roles",
+			user: User{
+				Username: "testuser",
+				Password: "password",
+			},
+			wantErr: true,
+			err:     ErrAtLeastOneRoleRequired,
+		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := tt.user.Validate(); err != tt.wantErr {
-				t.Errorf("User.Validate() error = %v, wantErr %v", err, tt.wantErr)
+			err := tt.user.Validate()
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Validate() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if err != tt.err {
+				t.Errorf("Validate() error = %v, expected %v", err, tt.err)
 			}
 		})
 	}
 }
 
-func TestUser_ParsePwd(t *testing.T) {
+func TestUser_HasRole(t *testing.T) {
 	user := User{
-		Username: "john_doe",
-		Password: "secret",
+		Username: "testuser",
+		Password: "password",
+		Roles:    []Role{Student, Teacher},
 	}
 
-	want := "2bb80d5..."
+	tests := []struct {
+		name string
+		role Role
+		want bool
+	}{
+		{
+			name: "Has role",
+			role: Student,
+			want: true,
+		},
+		{
+			name: "Does not have role",
+			role: Admin,
+			want: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := user.HasRole(tt.role); got != tt.want {
+				t.Errorf("HasRole() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestUser_ParseAndCheckPwd(t *testing.T) {
+	user := User{
+		Username: "testuser",
+		Password: "password",
+	}
+
 	if err := user.ParsePwd(); err != nil {
-		t.Errorf("User.ParsePwd() error = %v", err)
+		t.Fatalf("ParsePwd() failed: %v", err)
 	}
 
-	if user.Password[:10] != want {
-		t.Errorf("User.ParsePwd() got = %v, want %v", user.Password[:10], want)
+	// Verify password is hashed
+	_, err := hex.DecodeString(user.Password)
+	if err != nil {
+		t.Errorf("Password not properly hashed: %v", err)
+	}
+
+	// Check password
+	if !user.CheckPwd("password") {
+		t.Errorf("CheckPwd() failed to validate the correct password")
+	}
+
+	// Check wrong password
+	if user.CheckPwd("wrongpassword") {
+		t.Errorf("CheckPwd() incorrectly validated a wrong password")
 	}
 }

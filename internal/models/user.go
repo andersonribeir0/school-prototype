@@ -1,9 +1,10 @@
 package models
 
 import (
-	"crypto/sha256"
 	"encoding/hex"
 	"errors"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
 var (
@@ -47,16 +48,17 @@ func (u *User) Validate() error {
 }
 
 func (u *User) ParsePwd() error {
-	hash := sha256.New()
-	n, err := hash.Write([]byte(u.Password))
-	if n == 0 || err != nil {
-		return ErrInvalidPwdInput
-	}
-
-	hashBytes := hash.Sum(nil)
-	u.Password = hex.EncodeToString(hashBytes)
+	const cost = 14
+	hash, _ := bcrypt.GenerateFromPassword([]byte(u.Password), cost)
+	u.Password = hex.EncodeToString(hash)
 
 	return nil
+}
+
+func (u *User) CheckPwd(pwd string) bool {
+	hash, _ := hex.DecodeString(u.Password)
+	err := bcrypt.CompareHashAndPassword(hash, []byte(pwd))
+	return err == nil
 }
 
 type Role string

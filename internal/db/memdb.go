@@ -13,7 +13,7 @@ import (
 type UserRepository interface {
 	GetUserById(ctx context.Context, id string) (*models.User, error)
 	InsertUser(ctx context.Context, user *models.User) (string, error)
-	GetUserByUsernameAndPassword(ctx context.Context, username string, pwd string) (*models.User, error)
+	GetUserByUsername(ctx context.Context, username string) (*models.User, error)
 }
 
 type Database struct {
@@ -34,23 +34,25 @@ func NewDatabase(logger *slog.Logger) *Database {
 	}
 }
 
-func (db *Database) GetUserByUsernameAndPassword(ctx context.Context, username, password string) (*models.User, error) {
+func (db *Database) GetUserByUsername(ctx context.Context, username string) (*models.User, error) {
 	txn := db.db.Txn(false)
 	defer txn.Abort()
 
-	it, err := txn.Get("user", "username", username)
+	raw, err := txn.First("user", "username", username)
 	if err != nil {
 		return nil, err
 	}
 
-	for obj := it.Next(); obj != nil; obj = it.Next() {
-		user := obj.(*models.User)
-		if user.Password == password {
-			return user, nil
-		}
+	if raw == nil {
+		return nil, nil
 	}
 
-	return nil, fmt.Errorf("user not found")
+	user, ok := raw.(*models.User)
+	if !ok {
+		return nil, fmt.Errorf("[GetUserByUsername] invalid format for user")
+	}
+
+	return user, nil
 }
 
 func (db *Database) GetUserById(ctx context.Context, id string) (*models.User, error) {
@@ -67,7 +69,7 @@ func (db *Database) GetUserById(ctx context.Context, id string) (*models.User, e
 
 	user, ok := raw.(*models.User)
 	if !ok {
-		return nil, fmt.Errorf("invalid format for user")
+		return nil, fmt.Errorf("[GetUserById] invalid format for user")
 	}
 
 	return user, nil
