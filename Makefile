@@ -18,3 +18,6 @@ test:
 
 clean:
 	docker rmi $(IMAGE_NAME)
+
+generate:
+	@templ generate ./...

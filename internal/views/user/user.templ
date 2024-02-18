@@ -1,0 +1,20 @@
+package user
+
+import "github.com/andersonribeir0/school-prototype/internal/views/layout"
+import "github.com/andersonribeir0/school-prototype/internal/views/components"
+
+func getUser(c context.Context) string {
+	user, ok := c.Value("username").(string)
+	if !ok {
+		return ""
+	}
+
+	return user
+}
+
+templ Show() {
+	@layout.Base() {
+    	<h1>hello { getUser(ctx) } from the user page </h1>
+        @components.Input("email", "email")
+    }
+}

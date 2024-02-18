@@ -3,12 +3,15 @@ module github.com/andersonribeir0/school-prototype
 go 1.20
 
 require (
-	github.com/golang-jwt/jwt v3.2.2+incompatible
+	github.com/a-h/templ v0.2.543
 	github.com/hashicorp/go-memdb v1.3.4
 	github.com/labstack/echo-jwt/v4 v4.2.0
 )
 
-require golang.org/x/time v0.5.0 // indirect
+require (
+	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
+	golang.org/x/time v0.5.0 // indirect
+)
 
 require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
@@ -25,7 +28,7 @@ require (
 	github.com/stretchr/testify v1.8.4
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v1.2.2 // indirect
-	golang.org/x/crypto v0.17.0 // indirect
+	golang.org/x/crypto v0.17.0
 	golang.org/x/net v0.19.0 // indirect
 	golang.org/x/sys v0.15.0 // indirect
 	golang.org/x/text v0.14.0 // indirect

@@ -34,3 +34,8 @@ if echo "$ME_RESPONSE" | jq -e '.error' > /dev/null; then
 else
   echo "Response /me: $ME_RESPONSE"
 fi
+
+# Alteração aqui: abrir a URL no navegador com o token JWT
+AUTH_URL="$SERVER_URL/auth?token=$TOKEN"
+echo "Opening $AUTH_URL in the default web browser..."
+open "$AUTH_URL"

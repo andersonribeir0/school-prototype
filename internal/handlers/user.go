@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/andersonribeir0/school-prototype/internal/models"
+	"github.com/andersonribeir0/school-prototype/internal/views/user"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/labstack/echo/v4"
 )
@@ -94,4 +95,8 @@ func (a *API) GetMeHandler(c echo.Context) error {
 		"username": claims.Username,
 		"roles":    claims.Roles,
 	})
+}
+
+func (a *API) ShowMeHandler(c echo.Context) error {
+	return render(c, user.Show())
 }

@@ -1,0 +1,29 @@
+package layout
+
+templ Base() {
+	<!DOCTYPE html>
+	<html lang="en">
+		<head>
+			<meta charset="UTF-8"/>
+			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+			<title>Título da Página</title>
+		</head>
+		<body>
+			<header>
+				<nav>
+					<ul>
+						<li><a href="#home">Home</a></li>
+						<li><a href="#about">Sobre</a></li>
+						<li><a href="#contact">Contato</a></li>
+					</ul>
+				</nav>
+			</header>
+			<main>
+				{children...}
+			</main>
+			<footer>
+				<p>&copy; 2024 Nome da Empresa. Todos os direitos reservados.</p>
+			</footer>
+		</body>
+	</html>
+}
